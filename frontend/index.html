@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Tone Analyzer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+            width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 10px;
+            border: none;
+            background-color: #ff6b81;
+            color: white;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #ff4757;
+        }
+
+        .result {
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Local Tone Analyzer</h1>
+        <textarea id="textInput" placeholder="Type something here..."></textarea>
+        <button onclick="analyzeText()">Analyze</button>
+
+        <div id="result" class="result">Result will appear here.</div>
+    </div>
+
+    <script>
+        async function analyzeText() {
+            const text = document.getElementById('textInput').value;
+            const resultDiv = document.getElementById('result');
+
+            if (!text) {
+                resultDiv.textContent = "Please enter some text!";
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <strong>Text:</strong> ${data.text} <br>
+                    <strong>Score:</strong> ${data.score} <br>
+                    <strong>Comparative:</strong> ${data.comparative} <br>
+                    <strong>Positive Words:</strong> ${data.positiveWords.join(', ')} <br>
+                    <strong>Negative Words:</strong> ${data.negativeWords.join(', ')}
+                `;
+            } catch (err) {
+                resultDiv.textContent = `Error: ${err.message}`;
+            }
+        }
+    </script>
+</body>
+
+</html>
