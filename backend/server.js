@@ -32,6 +32,67 @@ const customWordLists = {
     hi: {
         positive: ['achha', 'bahut achha', 'uttam', 'sundar', 'pyara', 'shreshth', 'madhur', 'preeti', 'khushi', 'himmat', 'bahut sundar'],
         negative: ['bura', 'kharab', 'dukh', 'gussa', 'dard', 'mushkil', 'pareshan', 'nafrat', 'rona', 'chinta', 'bahut bura']
+    },
+    de: {
+        positive: ['schön', 'gut', 'wunderbar', 'toll', 'ausgezeichnet', 'prima', 'angenehm', 'herrlich', 'glücklich', 'sehr gut', 'fantastisch', 'perfekt'],
+        negative: ['schlecht', 'schrecklich', 'furchtbar', 'hässlich', 'traurig', 'böse', 'übel', 'schlimm', 'ärgerlich', 'sehr schlecht', 'miserabel']
+    },
+    es: {
+        positive: ['bueno', 'excelente', 'fantástico', 'hermoso', 'maravilloso', 'feliz', 'alegre', 'genial', 'estupendo', 'perfecto', 'increíble'],
+        negative: ['malo', 'terrible', 'horrible', 'feo', 'triste', 'pésimo', 'desagradable', 'fatal', 'peor', 'malísimo', 'espantoso']
+    },
+    fr: {
+        positive: ['bon', 'excellent', 'fantastique', 'beau', 'merveilleux', 'heureux', 'joyeux', 'génial', 'superbe', 'parfait', 'incroyable'],
+        negative: ['mauvais', 'terrible', 'horrible', 'laid', 'triste', 'affreux', 'désagréable', 'nul', 'pire', 'catastrophique', 'épouvantable']
+    },
+    it: {
+        positive: ['buono', 'eccellente', 'fantastico', 'bello', 'meraviglioso', 'felice', 'gioioso', 'ottimo', 'perfetto', 'incredibile', 'stupendo'],
+        negative: ['cattivo', 'terribile', 'orribile', 'brutto', 'triste', 'pessimo', 'spiacevole', 'peggiore', 'disastroso', 'spaventoso', 'terrificante']
+    },
+    pt: {
+        positive: ['bom', 'excelente', 'fantástico', 'bonito', 'maravilhoso', 'feliz', 'alegre', 'ótimo', 'perfeito', 'incrível', 'espetacular'],
+        negative: ['mau', 'terrível', 'horrível', 'feio', 'triste', 'péssimo', 'desagradável', 'pior', 'desastroso', 'assustador', 'espantoso']
+    },
+    nl: {
+        positive: ['goed', 'uitstekend', 'fantastisch', 'mooi', 'geweldig', 'gelukkig', 'blij', 'prima', 'perfect', 'ongelooflijk', 'prachtig'],
+        negative: ['slecht', 'verschrikkelijk', 'vreselijk', 'lelijk', 'droevig', 'ellendig', 'onaangenaam', 'erger', 'rampzalig', 'angstaanjagend', 'afschuwelijk']
+    }
+    ,
+    ja: {
+        positive: [
+            '良い', '素晴らしい', '最高', '嬉しい', '楽しい', '素敵', '快適', '満足', '最高だ', '良かった',
+            // Romanized / English-typed variants
+            'ii', 'yoi', 'subarashii', 'sugoi', 'ureshii', 'tanoshii', 'suteki', 'kaiteki', 'manzoku', 'saikou', 'yokatta'
+        ],
+        negative: [
+            '悪い', '最悪', 'ひどい', '悲しい', '不満', '不快', '嫌い', '辛い', '問題', '失望', '酷い',
+            // Romanized / English-typed variants
+            'warui', 'saiaku', 'hidoi', 'kanashii', 'fuman', 'fukai', 'kirai', 'tsurai', 'mondai', 'shitsubou'
+        ]
+    },
+    ko: {
+        positive: [
+            '좋다', '아주 좋다', '최고', '행복', '기쁘다', '즐겁다', '멋지다', '훌륭하다', '만족', '정말 좋다', '최고다',
+            // Romanized / English-typed variants
+            'johta', 'joayo', 'choego', 'haengbok', 'gippeuda', 'jeulgeopda', 'meotjida', 'hullyunghada', 'manjok', 'choegoda'
+        ],
+        negative: [
+            '나쁘다', '최악', '끔찍하다', '슬프다', '불만', '불쾌', '싫다', '고통', '문제', '실망', '형편없다',
+            // Romanized / English-typed variants
+            'nappeuda', 'choegak', 'kkeumjjikhada', 'seulpeuda', 'bulman', 'bulkwae', 'silta', 'gotong', 'munje', 'silmang'
+        ]
+    },
+    zh: {
+        positive: [
+            '好', '非常好', '棒', '精彩', '快乐', '幸福', '优秀', '满意', '漂亮', '美好', '太棒了',
+            // Romanized / English-typed variants (Pinyin)
+            'hao', 'feichang hao', 'bang', 'jingcai', 'kuaile', 'xingfu', 'youxiu', 'manyi', 'piaoliang', 'meihao', 'tai bang le'
+        ],
+        negative: [
+            '坏', '很糟', '糟糕', '难过', '悲伤', '讨厌', '失望', '问题', '可怕', '糟透了', '差劲',
+            // Romanized / English-typed variants (Pinyin)
+            'huai', 'hen zao', 'zaogao', 'nanguo', 'beishang', 'taoyan', 'shiwang', 'wenti', 'kepai', 'zaotoule'
+        ]
     }
 };
 
@@ -44,9 +105,9 @@ const languageNames = {
     it: 'Italian',
     pt: 'Portuguese',
     nl: 'Dutch',
-    hi: 'Hindi (Type in English)',
-    te: 'Telugu (Type in English)',
-    ta: 'Tamil (Type in English)',
+    hi: 'Hindi',
+    te: 'Telugu',
+    ta: 'Tamil',
     ja: 'Japanese',
     ko: 'Korean',
     zh: 'Chinese'
@@ -106,8 +167,8 @@ app.post('/analyze', (req, res) => {
     try {
         let result;
         
-        // Use custom analysis for Indian languages
-        if (['te', 'ta', 'hi'].includes(language)) {
+        // Use custom analysis for languages with word lists
+        if (customWordLists[language]) {
             const customAnalysis = analyzeIndianLanguageText(text, language);
             result = {
                 score: customAnalysis.score,
