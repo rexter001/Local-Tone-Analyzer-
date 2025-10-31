@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Tone Analyzer</title>
+    <title>Multilingual Tone Analyzer</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -13,8 +13,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
+            padding: 20px;
         }
 
         .container {
@@ -22,22 +23,46 @@
             padding: 30px 40px;
             border-radius: 15px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
-            width: 400px;
+            width: 100%;
+            max-width: 500px;
         }
 
         h1 {
             text-align: center;
             margin-bottom: 20px;
+            color: #fff;
         }
 
-        textarea {
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        select {
             width: 100%;
-            height: 100px;
             padding: 10px;
             border-radius: 10px;
             border: none;
             margin-bottom: 15px;
             font-size: 16px;
+            background-color: white;
+        }
+
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            margin-bottom: 15px;
+            font-size: 16px;
+            background-color: white;
+            resize: vertical;
         }
 
         button {
@@ -63,51 +88,233 @@
             border-radius: 10px;
             word-wrap: break-word;
         }
+
+        .score {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .positive { color: #4cd137; }
+        .negative { color: #ff4757; }
+        .neutral { color: #f7b731; }
+
+        .language-detected {
+            font-style: italic;
+            color: #70a1ff;
+        }
+
+        .error {
+            color: #ff4757;
+            background-color: rgba(255, 71, 87, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .placeholder-text {
+            color: #666;
+            font-style: italic;
+        }
+
+        .help-text {
+            font-size: 0.9em;
+            color: #70a1ff;
+            margin-top: 5px;
+        }
+
+        .examples-box {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        .examples-box.show {
+            display: block;
+        }
+
+        .word-chip {
+            display: inline-block;
+            padding: 2px 8px;
+            margin: 2px;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.2);
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Local Tone Analyzer</h1>
-        <textarea id="textInput" placeholder="Type something here..."></textarea>
-        <button onclick="analyzeText()">Analyze</button>
-
-        <div id="result" class="result">Result will appear here.</div>
+        <h1>Multilingual Tone Analyzer</h1>
+        <div class="input-group">
+            <label for="languageSelect">Select Language:</label>
+            <select id="languageSelect">
+                <!-- Will be populated by JavaScript -->
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="textInput">Enter Text:</label>
+            <textarea id="textInput" placeholder="Type or paste your text here... For Indian languages, type in English (e.g., 'chala bagundi' for Telugu)"></textarea>
+            <div id="helpText" class="help-text"></div>
+        </div>
+        <div id="examples" class="examples-box"></div>
+        <button onclick="analyzeText()">Analyze Tone</button>
+        <div id="result" class="result">Select a language and enter text to analyze the tone...</div>
     </div>
 
     <script>
+        const indianLanguages = ['te', 'ta', 'hi'];
+        const BASE_URL = location.protocol === 'file:' ? 'http://localhost:3000' : '';
+        
+        // Define default languages in case server is not accessible
+        const defaultLanguages = [
+            { code: 'en', name: 'English' },
+            { code: 'te', name: 'Telugu (Type in English)' },
+            { code: 'ta', name: 'Tamil (Type in English)' },
+            { code: 'hi', name: 'Hindi (Type in English)' }
+        ];
+
+        // Fetch available languages when page loads
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch(BASE_URL + '/languages');
+                const languages = await response.json();
+                const select = document.getElementById('languageSelect');
+                
+                languages.forEach(lang => {
+                    const option = document.createElement('option');
+                    option.value = lang.code;
+                    option.textContent = lang.name;
+                    select.appendChild(option);
+                });
+
+                // Add change event listener to language select
+                select.addEventListener('change', updateHelpText);
+                updateHelpText(); // Initial update
+            } catch (error) {
+                console.error('Error loading languages:', error);
+                // Fall back to default languages if server is not accessible
+                const select = document.getElementById('languageSelect');
+                defaultLanguages.forEach(lang => {
+                    const option = document.createElement('option');
+                    option.value = lang.code;
+                    option.textContent = lang.name;
+                    select.appendChild(option);
+                });
+            }
+        });
+
+        function updateHelpText() {
+            const language = document.getElementById('languageSelect').value;
+            const helpText = document.getElementById('helpText');
+            const examplesBox = document.getElementById('examples');
+            
+            if (indianLanguages.includes(language)) {
+                helpText.textContent = 'Type in English letters (transliterated text). For example:';
+                let examples = '';
+                switch(language) {
+                    case 'te':
+                        examples = 'chala bagundi (very good), manchidi (good), kopam (anger)';
+                        break;
+                    case 'ta':
+                        examples = 'romba nalla (very good), magilchi (happy), kovam (anger)';
+                        break;
+                    case 'hi':
+                        examples = 'bahut achha (very good), khushi (happiness), gussa (anger)';
+                        break;
+                }
+                examplesBox.innerHTML = `<strong>Example words:</strong> ${examples}`;
+                examplesBox.classList.add('show');
+            } else {
+                helpText.textContent = '';
+                examplesBox.classList.remove('show');
+            }
+        }
+
         async function analyzeText() {
             const text = document.getElementById('textInput').value;
+            const language = document.getElementById('languageSelect').value;
             const resultDiv = document.getElementById('result');
 
             if (!text) {
-                resultDiv.textContent = "Please enter some text!";
+                resultDiv.innerHTML = '<div class="error">Please enter some text to analyze!</div>';
                 return;
             }
 
+            resultDiv.innerHTML = '<div style="color: #2575fc;">Analyzing...</div>';
+
             try {
-                const response = await fetch('http://localhost:3000/analyze', {
+                const response = await fetch(BASE_URL + '/analyze', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ text })
+                    body: JSON.stringify({ text, language })
                 });
 
+                const data = await response.json();
+
                 if (!response.ok) {
-                    throw new Error(`Server error: ${response.status}`);
+                    throw new Error(data.error || 'Failed to analyze text');
                 }
 
-                const data = await response.json();
+                let sentimentClass = 'neutral';
+                if (data.score > 0.2) sentimentClass = 'positive';
+                if (data.score < -0.2) sentimentClass = 'negative';
+
+                // Handle identified words for Indian languages
+                let identifiedWordsHtml = '';
+                if (data.details && data.details.identifiedPositiveWords && data.details.identifiedNegativeWords) {
+                    identifiedWordsHtml = `
+                        <div class="word-analysis">
+                            <p><strong>Identified Positive Words:</strong> ${data.details.identifiedPositiveWords.length ? data.details.identifiedPositiveWords.join(', ') : 'None'}</p>
+                            <p><strong>Identified Negative Words:</strong> ${data.details.identifiedNegativeWords.length ? data.details.identifiedNegativeWords.join(', ') : 'None'}</p>
+                        </div>
+                    `;
+                }
+
+                // Handle examples for Indian languages
+                let examplesHtml = '';
+                if (data.details && data.details.examples) {
+                    examplesHtml = `
+                        <div class="examples-info">
+                            <p><strong>Common positive words:</strong> ${data.details.examples.positiveExamples}</p>
+                            <p><strong>Common negative words:</strong> ${data.details.examples.negativeExamples}</p>
+                        </div>
+                    `;
+                }
+
                 resultDiv.innerHTML = `
-                    <strong>Text:</strong> ${data.text} <br>
-                    <strong>Score:</strong> ${data.score} <br>
-                    <strong>Comparative:</strong> ${data.comparative} <br>
-                    <strong>Positive Words:</strong> ${data.positiveWords.join(', ')} <br>
-                    <strong>Negative Words:</strong> ${data.negativeWords.join(', ')}
+                    <div>
+                        <p class="language-detected">Analyzing in ${data.language || 'English'}</p>
+                        <p><strong>Text:</strong> ${data.text || ''}</p>
+                        <p class="score ${sentimentClass}">
+                            ${data.sentiment || 'Neutral'} (Score: ${data.score || 0})
+                        </p>
+                        <div class="word-analysis">
+                            <p><strong>Positive Words:</strong> ${(data.positiveWords && data.positiveWords.length) ? data.positiveWords.join(', ') : 'None'}</p>
+                            <p><strong>Negative Words:</strong> ${(data.negativeWords && data.negativeWords.length) ? data.negativeWords.join(', ') : 'None'}</p>
+                        </div>
+                        <p class="placeholder-text">
+                            ${Math.abs(data.score || 0) === 0 ? 'Neutral tone detected' :
+                              Math.abs(data.score || 0) < 2 ? 'Mild ' + data.sentiment.toLowerCase() + ' tone detected' :
+                              Math.abs(data.score || 0) < 4 ? 'Moderate ' + data.sentiment.toLowerCase() + ' tone detected' :
+                              'Strong ' + data.sentiment.toLowerCase() + ' tone detected'}
+                        </p>
+                    </div>
                 `;
             } catch (err) {
-                resultDiv.textContent = `Error: ${err.message}`;
+                resultDiv.innerHTML = `<div class="error">${err.message}</div>`;
             }
         }
     </script>
